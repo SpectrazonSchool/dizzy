@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Discord Web Chat</title>
+    <style>
+      body { font-family: sans-serif; background: #2c2f33; color: white; }
+      #messages { list-style: none; padding: 0; }
+      #messages li { padding: 5px 10px; border-bottom: 1px solid #444; }
+      form { display: flex; margin-top: 10px; }
+      input { flex: 1; padding: 10px; border: none; }
+      button { padding: 10px; border: none; background: #7289da; color: white; }
+    </style>
+  </head>
+  <body>
+    <h2>Discord Channel Bridge</h2>
+    <ul id="messages"></ul>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="Type a message..." />
+      <button>Send</button>
+    </form>
+
+    <!-- ✅ Load socket.io client first -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- ✅ Your script comes after -->
+    <script>
+      const socket = io();
+
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const messages = document.getElementById("messages");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit("chat message", input.value);
+          input.value = "";
+        }
+      });
+
+      socket.on("chat message", (msg) => {
+        const item = document.createElement("li");
+        item.textContent = `${msg.author}: ${msg.content}`;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+    </script>
+  </body>
+</html>
